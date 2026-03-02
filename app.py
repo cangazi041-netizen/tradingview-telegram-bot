@@ -13,18 +13,24 @@ def home():
 
 @app.route("/webhook", methods=["POST"])
 def webhook():
-    data = request.json
-    message = data.get("message", "Signal received")
+    try:
+        data = request.get_json(force=True)
 
-    url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
-    payload = {
-        "chat_id": CHAT_ID,
-        "text": message
-    }
+        message = data.get("message", "Signal received")
 
-    requests.post(url, json=payload)
+        url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
+        payload = {
+            "chat_id": CHAT_ID,
+            "text": message
+        }
 
-    return {"status": "ok"}
+        requests.post(url, json=payload)
+
+        return {"status": "ok"}, 200
+
+    except Exception as e:
+        print("Error:", e)
+        return {"status": "error"}, 400
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
