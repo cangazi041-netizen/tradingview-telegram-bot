@@ -16,12 +16,22 @@ def webhook():
     try:
         data = request.get_json(force=True)
 
-        message = data.get("message", "Signal received")
+        text = f"""
+{data['side']} SIGNAL
+
+Symbol: {data['symbol']}
+TF: {data['tf']}
+Entry: {data['entry']}
+SL: {data['sl']}
+TP1: {data['tp1']}
+TP2: {data['tp2']}
+"""
 
         url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
+
         payload = {
             "chat_id": CHAT_ID,
-            "text": message
+            "text": text
         }
 
         requests.post(url, json=payload)
@@ -31,6 +41,7 @@ def webhook():
     except Exception as e:
         print("Error:", e)
         return {"status": "error"}, 400
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
